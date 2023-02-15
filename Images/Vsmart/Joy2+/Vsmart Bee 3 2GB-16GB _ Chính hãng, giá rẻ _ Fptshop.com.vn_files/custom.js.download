@@ -1,0 +1,10 @@
+loadScriptBody('https://js.fpt.shop/datalake/resources/custom/order_status.js?ver=034003042019');
+
+
+function loadScriptBody(lib) {
+	var script = document.createElement('script');
+	script.async = true;
+	script.setAttribute('src', lib);
+	document.getElementsByTagName('body')[0].appendChild(script);
+	return script;
+}

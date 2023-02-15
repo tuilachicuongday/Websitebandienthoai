@@ -1,0 +1,105 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body, html{
+    font-family: Tahoma;
+    font-size: 13px;
+    width: 100%;
+    margin: 0px auto;
+    scroll-behavior: smooth;
+    
+}
+.content{
+    height: 100%;
+    width: 100%;
+    background: #50a3a2;
+    background: -webkit-linear-gradient(top left, #50a3a2 0%, #53e3a6 100%);
+    background: -moz-linear-gradient(top left, #50a3a2 0%, #53e3a6 100%);
+    background: -o-linear-gradient(top left, #50a3a2 0%, #53e3a6 100%);
+    background: linear-gradient(to bottom right, #50a3a2 0%, #53e3a6 100%);
+    background-position: center;
+    background-size: cover;
+    position: absolute;
+}
+.form-box{
+    width: 380px;
+    height: 680px;
+    position: relative;
+    margin: 5% auto;
+    background: white;
+    padding: 5px;
+}
+.login-box{
+    width: 220px;
+    margin: 35px auto;
+    text-align: center;
+    position: relative;
+    border-radius: 30px;
+    font-size: 30px;
+    font-weight: bold;
+    background: linear-gradient(to bottom right, #50a3a2 0%, #53e3a6 100%);
+
+}
+.icon{
+    margin: 30px auto;
+    text-align: center;
+}
+.icon img{
+    width: 30px;
+    margin:0 12px;
+    box-shadow: 0 0 20px 0 #7f7f7f3d;
+    cursor: pointer;
+    border-radius: 50px;
+}
+.input-group{
+    top: 180px;
+    left:50px;
+    position: absolute;
+    width: 280px;
+}
+.input-field{
+    width: 100%;
+    padding: 12px 0;
+    margin: 5px 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid #999;
+    outline: none;
+}
+.submit-button{
+    width: 85%;
+    padding:10px 30px;
+    cursor: pointer;
+    margin: auto;
+    display: block;
+    background: linear-gradient(to bottom right, #50a3a2 0%, #53e3a6 100%);
+    border: 0;
+    outline: none;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: bold;
+}
+.check-box{
+    margin: 30px 10px 30px 0;
+}
+span{
+    color:#777;
+    font-size: 12px;
+    bottom: 82px;
+    position: absolute;
+}
+a{
+    text-decoration: none;
+    color: black;
+}
+.backtohome{
+    bottom: -110px;
+    right:-40px;
+    position: absolute;
+}
+a:hover{
+    color: blue;
+}

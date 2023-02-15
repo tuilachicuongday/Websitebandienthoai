@@ -1,0 +1,110 @@
+function setUser(userid, userName, userEmail, userPhone, userAddr, userIp) {
+    var user = {}
+    user["strack_userid"] = userid;
+    user["strack_username"] = userName;
+    user["strack_useremail"] = userEmail;
+    user["strack_userphone"] = userPhone;
+    user["strack_useraddr"] = userAddr;
+    user["strack_userip"] = userIp;
+    try {
+        localStorage["user"] = JSON.stringify(user);
+    } catch (e) {
+        alert("Error when writing to Local Storage\n" + e);
+    }
+}
+
+function setAttr(key, value) {
+
+    var attr = JSON.parse(localStorage.getItem("userattr"));
+    if (attr == null) {
+        attr = {}
+    }
+    attr[key] = value;
+    try {
+        // lấy userattr cũ ra xong replace } thành "," xong rồi gắn attr[key] = value với vào
+        localStorage["userattr"] = JSON.stringify(attr);
+    } catch (e) {
+        alert("Error when writing to Local Storage\n" + e);
+    }
+}
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+function validatePhone(phone) {
+    var re = /^(098|095|097|096|0169|0168|0167|0166|0165|0164|0163|0162|090|093|0122|0126|0128|0121|0120|091|094|0123|0124|0125|0127|0129|092|0188|0186|099|0199|086|088|089|087|039|038|037|036|035|034|033|032|070|079|077|076|078|084|081|082|083|085|056|058|059|052)[0-9]{7}$/;
+    return re.test(String(phone));
+}
+setTimeout(() => {
+    try {
+        if (ip == null) {
+            ip = {}
+            ip["ip"] = null;
+        }
+        //get info form order desktop
+        $("#ubtn").on("click", function () {
+            var userid = CommonWeb.trackSession();
+            var userphone = validatePhone(document.getElementById("uphone").value) ? document.getElementById("uphone").value : null;
+            var username = document.getElementById("uname").value;
+            var useremail = validateEmail(document.getElementById("uemail").value) ? document.getElementById("uemail").value : null;
+            setUser(userid, username, useremail, userphone, null, ip["ip"]);
+        });
+
+        // get info form order mobile
+        $("#nxttoinfo").on("click", function () {
+            var userid = CommonWeb.trackSession();
+            var userphone = validatePhone(document.getElementById("CustomerPhone").value) ? document.getElementById("CustomerPhone").value : null;
+            var username = document.getElementById("CustomerName").value;
+            var useremail = validateEmail(document.getElementById("CustomerEmail").value) ? document.getElementById("CustomerEmail").value : null;
+            setUser(userid, username, useremail, userphone, null, ip["ip"]);
+        });
+
+        // trả góp 
+        // $(".tg-foacch li").on("click", function(){
+        //     var gender = $(this).index() == 0 ? "Anh": "Chị";
+        //     var cmnd = document.getElementById("txtCmd").value;
+        //     setAttr("gender", gender); 
+        // });
+
+        $("#AddOrderRecurring").on("click", function () {
+            var gender = $("input[name=chkgt]:checked").val() == null ? null : $("input[name=chkgt]:checked").val() == "1" ? 'Nam' : 'Nữ';
+            var cmnd = document.getElementById("txtCmd").value;
+            var birthday = document.getElementById("num1").value + "/" + document.getElementById("num2").value + "/" + document.getElementById("num3").value;
+            var city = $("#sl-city option:selected").text();
+            var district = $("#sl-district option:selected").text();
+            var addr = document.getElementById("txtAddress").value;
+            var numberGuarantor = validatePhone(document.getElementById("txtPhoneNumberGuarantor").value) ? document.getElementById("txtPhoneNumberGuarantor").value : null;
+            var name = document.getElementById("txtName").value;
+            var phone = validatePhone(document.getElementById("txtPhone").value) ? document.getElementById("txtPhone").value : null
+
+            setUser(CommonWeb.trackSession(), name, null, phone, addr, ip["ip"]);
+
+            setAttr("gender", gender);
+            setAttr("birthday", birthday);
+            setAttr("cmnd", cmnd);
+            setAttr("city", city);
+            setAttr("district", district);
+            setAttr("phoneguarantor", numberGuarantor);
+            //setAttr("address", addr);
+        });
+
+        // desk top the master
+
+        if (window.location.href.includes('tra-gop?tab=card')) {
+            $("#AddOrder").on("click", function () {
+                var gender = $("input[name=chkgt1]:checked").val() == "0" ? "Nam" : "Nữ";
+                var name = document.getElementById("txtName-ol").value;
+                var phone = validatePhone(document.getElementById("txtPhone-ol").value) ? document.getElementById("txtPhone-ol").value : null
+
+                setUser(CommonWeb.trackSession(), name, null, phone, null, ip["ip"]);
+
+                setAttr("gender", gender);
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+}, 2000);

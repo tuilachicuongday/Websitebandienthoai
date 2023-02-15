@@ -1,0 +1,607 @@
+//get ip user
+var ip_func = async function(){
+  var res;
+  var result;
+  await $.ajax({
+    type: "get",
+    url: 'https://api.ipify.org?format=json',
+    datatype: 'json',
+    success: function(res){
+      result = res;
+    }
+  });
+  return result;
+  }
+var ip;
+var ip_storage = async function(){
+  if(sessionStorage.getItem('ip') == null)
+  {
+    var ip_result;
+    await ip_func().then(function(ip_result){
+      ip = ip_result;
+    });
+    sessionStorage.setItem('ip', JSON.stringify(ip));
+  }
+  ip = JSON.parse(sessionStorage.getItem('ip'));
+}
+
+//get location
+function getLocation() {
+  if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pushPosition);
+  }
+}
+var coords;
+function pushPosition(position) {
+  coords = {"coords": position.coords.latitude + ", " + position.coords.longitude};
+}
+
+// get object Cookie
+// var jsonCookie = "{";
+// var cookieValue = document.cookie.split("; ");
+// for(var i = 0; i < cookieValue.length; i++){
+//   var cookieObj = cookieValue[i].split("=");
+//   var obj = "\"" + cookieObj[0] + "\"" + ":" + "\"" + cookieObj[1] + "\"";
+//   if(i == cookieValue.length - 1){
+    
+//     jsonCookie += obj;
+//     jsonCookie += "}";
+//     break;
+//     }
+//   jsonCookie += obj;
+//   jsonCookie += ",";
+// }
+
+var getFullCookies = function(){
+  var pairs = document.cookie.split(";");
+  var cookies = {};
+  for (var i=0; i<pairs.length; i++){
+    var pair = pairs[i].split("=");
+    cookies[(pair[0]+'').trim()] = unescape(pair[1]);
+  }
+  return cookies;
+};
+var Platform = function(){
+  if((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)){
+      return "Mobile";
+  }
+  return "Desktop";
+};
+try {
+  //var objCookie = {"objectCookie": JSON.parse(jsonCookie)};
+  var objCookie = {"objectCookie": getFullCookies()};
+} catch (error) {
+  console.log(error);
+}
+
+(async function () {
+
+  var options = {
+    pageviewsEventName: "pageviews",
+    inputChangeEventName: "input-changes",
+    clicksEventName: "clicks",
+    formSubmissionsEventName: "form-submissions",
+    ajaxFormSubmissionEventName: "ajax-form-submission",
+    callbackTimeout: 1000,
+    globalProperties: {
+      page_url: window.location.href,
+      referrer_url: document.referrer
+    }
+  };
+  
+//-------------------------------------------------------------------------------------------//
+  // create a common namespace with options
+  var CommonWeb = {
+    options: options
+  };
+
+  CommonWeb.addGlobalProperties = function(properties) {
+    $.extend(CommonWeb.options.globalProperties, properties);
+  }
+
+  //--------------------------------------------------------------------------------------------------------------
+  // initiate user tracking, using a GUID stored in a cookie
+  // The user can pass in a custom cookie name and custom GUID, if they would like
+
+  CommonWeb.trackSession = function(cookieName, defaultGuid)//, flag) {
+  {
+    if(typeof(cookieName) !== "string") {
+      cookieName = "sessionID";
+    }
+
+    // Look for the GUID in the currently set cookies
+    var cookies = document.cookie.split('; ');
+    var guid = null;
+
+    for(var i=0; i < cookies.length; i++) {
+      cookieParts = cookies[i].split('=')
+      if(cookieParts[0] === cookieName) {
+        // Got it!
+        guid = cookieParts[1];
+        break;
+      }
+    }
+
+    // We didn't find our guid in the cookies, so we need to generate our own
+    if(guid === null) {
+      if(typeof(defaultGuid) === "string") {
+        guid = defaultGuid;
+      } else {
+        genSub = function() {
+          return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        }
+
+        guid = genSub() + genSub() + "-" + genSub() + "-" + 
+          genSub() + "-" + genSub() + "-" + genSub() + genSub() + genSub();
+      }
+
+      expiration_date = new Date();
+      expiration_date.setFullYear(expiration_date.getFullYear() + 1);
+
+      cookie_string = cookieName + "=" + guid + "; path/; expires=" + expiration_date.toGMTString();
+      document.cookie = cookie_string
+
+    }
+    
+      CommonWeb.addGlobalProperties({sessionID: guid});
+  
+    return guid;
+  }
+  
+ 
+   //---------------------------------------------------------------------------------------------
+
+  // setup pageview tracking hooks, optionally including more properties
+  // more properties can also be a function
+  // do not double set along with track!
+  CommonWeb.trackPageview = function (moreProperties) {
+	//Customize add date time
+  var time = {dateTime: new Date().getTime()}
+	var collectionName = {collection: CommonWeb.options.pageviewsEventName}
+  var defaultProperties = CommonWeb.options.globalProperties;
+  // add table user and userattr
+  if(localStorage.getItem("user") != null || localStorage.getItem("userattr") != null){
+    if(localStorage.getItem("user") == null){
+      var userattr = { "strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+      var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties), time, ip, collectionName, coords, objCookie, userattr);
+    }
+    if(localStorage.getItem("userattr") == null){
+      var user = { "strack_user": JSON.parse(localStorage.getItem("user"))};
+      var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties), time, ip, collectionName, coords, objCookie, user);
+    }
+    var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+    var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+    var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties), time, ip, collectionName, coords, objCookie, user, userattr);
+  }
+  else{
+    var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties), time, ip, collectionName, coords, objCookie);
+  }
+	
+	CommonWeb.Callback(CommonWeb.options.pageviewsEventName, properties);
+	
+  }
+
+  CommonWeb.trackClicks = function (elements, moreProperties) {
+    if (typeof elements === 'undefined') {
+      elements = $("a");
+    }
+    $.each(elements, function (index, element) {
+
+      $(element).on('click', function (event) {
+        
+        var timer = CommonWeb.options.callbackTimeout;
+
+        // combine local and global moreProperties
+        var properties = toClickProperties(event, element, moreProperties);
+        //debugger;
+        // check if the page is probably going to unload
+        var pageWillUnload = element.href && element.target !== '_blank' && !isMetaKey(event);
+        var unloadCallback = function () {
+        };
+
+        // if the page will unload, don't let the JS event bubble
+        // but navigate to the href after the click
+        if (pageWillUnload) {
+          unloadCallback = function () {
+            window.location.href = element.href;
+          };
+          
+        
+        }
+        //console.log(options.clicksEventName);
+        CommonWeb.Callback(options.clicksEventName, properties, unloadCallback);
+
+      });
+
+    });
+
+  }
+
+  // track things that are not links; i.e. don't need any special tricks to
+  // prevent page unloads
+  CommonWeb.trackClicksPassive = function (elements, moreProperties) {
+
+    $.each(elements, function (index, element) {
+
+      $(element).on('click', function (event) {
+
+        var properties = toClickProperties(event, element, moreProperties);
+        
+        CommonWeb.Callback(options.clicksEventName, properties);
+
+      });
+
+    });
+  }
+
+  // track form submissions
+  CommonWeb.trackFormSubmissions = function (elements, moreProperties) {
+    
+    if (typeof elements === 'undefined') {
+      elements = $("form");
+    }
+    
+    $.each(elements, function (index, element) {
+
+      var timer = CommonWeb.options.callbackTimeout;
+
+      // use to avoid duplicate submits
+      var callbackCalled = false;
+
+      $(element).on('submit', function (event) {
+
+        var properties = toSubmitProperties(event, element, moreProperties);
+
+        // assume true for now in this method
+        var pageWillUnload = true;
+        var unloadCallback = function () {
+        };
+
+        if (pageWillUnload) {
+
+          unloadCallback = function () {
+          };
+
+        }
+        CommonWeb.Callback(options.formSubmissionsEventName, properties, unloadCallback);
+      });
+
+    });
+  }
+
+  // track Ajax form submission
+  CommonWeb.trackAjaxFormSubmission = function (formelement, clickelement, moreProperties) {
+
+    $(clickelement).on('click', function (event) {
+
+      event.type = 'submit'; //Change current Event from Click to Submit because we need track this as Ajax Form Submit
+      var properties = toSubmitProperties(event, formelement, moreProperties);
+      
+      CommonWeb.Callback(options.ajaxFormSubmissionEventName, properties);
+
+    });
+    
+  }
+
+  CommonWeb.trackInputChanges = function (elements, moreProperties) {
+
+    if (typeof elements === 'undefined') {
+      elements = $("input, textarea, select");
+    }
+
+    $.each(elements, function(index, element) {
+      var currentValue = $(element).val()
+
+      $(element).on('change', function(event) {
+
+        var properties = toChangeProperties(event, element, currentValue, moreProperties);
+        properties.element.value =  $(element).val(); //add current value to properties
+        CommonWeb.Callback(options.inputChangeEventName, properties);
+
+        currentValue = $(element).val();
+      });
+
+    });
+  }
+//custom track input changes search form
+  CommonWeb.handleInputChange = function (event, moreProperties) {
+
+      var currentValue = event.target.value;
+
+      var properties = toChangeProperties(event, event.target, currentValue, moreProperties);
+      properties.element.value =  event.target.value; //add current value to properties
+      CommonWeb.Callback(options.inputChangeEventName, properties);
+  }
+    
+  // }//End custom
+
+  // define a namespace just for transformations of events and elements to properties
+  // override as a workaround to add / remove properties
+  CommonWeb.Transformations = {
+
+    eventToProperties: function (event) {
+
+      var properties = {};
+
+      properties['timestamp'] = event.timestamp;
+      properties['type'] = event.type;
+      properties['metaKey'] = event.metaKey;
+
+      return properties;
+
+    },
+
+    elementToProperties: function (element, extraProperties) {
+
+      var properties = extraProperties || {};
+
+      // add the tag name
+      properties.tagName = element.tagName;
+
+      // add the inner text for some tag types
+      if (element.tagName === 'A') {
+        properties.text = element.innerText;
+      }
+
+      // add each attribute
+      $(element.attributes).each(function (index, attr) {
+        properties[attr.nodeName] = attr.value;
+      });
+
+      // break classes out into an array if any exist
+      var classes = $(element).attr('class');
+      if (classes) {
+        properties['classes'] = classes.split(/\s+/)
+      }
+
+      //properties['path'] = $(element).getPath();
+
+      return properties;
+
+    },
+
+    formElementToProperties: function (formElement) {
+
+      //SPECIAL FIX: Add Name attribute for Input Element lack of name attribute, jQuery serialize() and serializeArray() need Name attribute
+      $($(formElement).prop('elements')).each(function(){
+          if(!this.name){
+            if(this.id){
+              this.name = this.id;
+            }else{
+              this.name = Math.random().toString(36).substr(2, 10);
+            }
+          }
+      });
+
+      var formValues = {};
+
+      // TODO: remove dependency on jQuery
+      formValues.form_values = $(formElement).serializeArray();
+      // simple alias for now, but could do more as
+      // far as the form values are concerned
+      return this.elementToProperties(formElement, formValues);
+
+    },
+
+    inputElementToProperties: function(inputElement) {
+
+      var inputValues = {
+        value: $(inputElement).val()
+      };
+      //debugger;
+      var parentForm = $(inputElement).closest("form");
+      
+      // if(parentForm.size() > 0) {
+      //   inputValues.form = this.elementToProperties(parentForm[0])
+      // }
+      if(parentForm.length > 0) {
+        inputValues.form = this.elementToProperties(parentForm[0]);
+      }
+
+      return this.elementToProperties(inputElement, inputValues);
+
+    }
+
+  }
+  
+
+  function toClickProperties(event, element, moreProperties) {
+    //Customize add date time
+    var time = {dateTime:new Date().getTime()}
+
+    var defaultProperties = CommonWeb.options.globalProperties;
+    var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties, [event, element]));
+
+    var elementProperties = { element: CommonWeb.Transformations.elementToProperties(element, null) };
+    var eventProperties = { event: CommonWeb.Transformations.eventToProperties(event) };
+    var collectionName = {collection: CommonWeb.options.clicksEventName}
+    // add table user and userattr
+    if(localStorage.getItem("user") != null || localStorage.getItem("userattr") != null){
+      if(localStorage.getItem("user") == null){
+        var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+        return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, userattr);
+      }
+      if(localStorage.getItem("userattr") == null){
+        var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+        return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, user);
+      }
+      var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+      var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+      return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, user, userattr);
+    }
+    return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie);
+
+  }
+
+  function toChangeProperties(event, element, previousValue, moreProperties) {
+    //Customize add date time
+    var time = {dateTime: new Date().getTime()}
+    //
+    var defaultProperties = CommonWeb.options.globalProperties;
+    var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties, [event, element]));
+
+    var elementProperties = { element: CommonWeb.Transformations.inputElementToProperties(element) };
+    if(previousValue && previousValue !== "") {
+      elementProperties.element.previousValue = previousValue
+    }
+
+    var eventProperties = { event: CommonWeb.Transformations.eventToProperties(event) };
+    var collectionName = {collection: CommonWeb.options.inputChangeEventName}
+
+    // add table user and userattr
+    if(localStorage.getItem("user") != null || localStorage.getItem("userattr") != null){
+      if(localStorage.getItem("user") == null){
+        var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+        return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, userattr);
+      }
+      if(localStorage.getItem("userattr") == null){
+        var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+        return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, user);
+      }
+      var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+      var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+      return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, user, userattr);
+    }
+    return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie);
+  }
+  
+
+  function toSubmitProperties(event, element, moreProperties) {
+    //Customize add date time
+    var time = {dateTime:new Date().getTime()}
+
+    var defaultProperties = CommonWeb.options.globalProperties;
+    var properties = $.extend(true, {}, defaultProperties, toProperties(moreProperties, [event, element]));
+
+    var elementProperties = { element: CommonWeb.Transformations.formElementToProperties(element) };
+    var eventProperties = { event: CommonWeb.Transformations.eventToProperties(event) };
+    var collectionName = {collection: CommonWeb.options.formSubmissionsEventName}
+
+    // add table user and userattr
+    if(localStorage.getItem("user") != null || localStorage.getItem("userattr") != null){
+      if(localStorage.getItem("user") == null){
+        var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+        return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, userattr);
+      }
+      if(localStorage.getItem("userattr") == null){
+        var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+        return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, user);
+      }
+      var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+      var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+      return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie, user, userattr);
+    }
+    return $.extend(true, {}, properties, elementProperties, eventProperties, time, ip, collectionName, coords, objCookie);
+
+  }
+
+  function toProperties(propertiesOrFunction, args) {
+    if (typeof propertiesOrFunction === 'function') {
+      return propertiesOrFunction.apply(window, args);
+    } else {
+      return propertiesOrFunction
+    }
+  }
+
+  function isMetaKey(event) {
+    return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey;
+  }
+
+  /*
+   jQuery-GetPath v0.01, by Dave Cardwell. (2007-04-27)
+
+   http://davecardwell.co.uk/javascript/jquery/plugins/jquery-getpath/
+
+   Copyright (c)2007 Dave Cardwell. All rights reserved.
+   Released under the MIT License.
+
+
+   Usage:
+   var path = $('#foo').getPath();
+   */
+  jQuery.fn.extend({
+    getPath: function( path ) {
+      // The first time this function is called, path won't be defined.
+      if ( typeof path == 'undefined' ) path = '';
+
+      // If this element is <html> we've reached the end of the path.
+      if ( this.is('html') )
+        return 'html' + path;
+
+      // Add the element name.
+      var cur = this.get(0).nodeName.toLowerCase();
+
+      // Determine the IDs and path.
+      var id    = this.attr('id'),
+        klass = this.attr('class');
+
+      // Add the #id if there is one.
+      if ( typeof id != 'undefined' )
+        cur += '#' + id;
+
+      // Add any classes.
+      if ( typeof klass != 'undefined' )
+      cur += '.' + klass.split(/[\s\n]+/).join('.');
+
+      // Recurse up the DOM.
+      return this.parent().getPath( ' > ' + cur + path );
+    }
+  });
+
+  // backends
+
+  CommonWeb.Keen = {
+    Client: null,
+    Debug: false,
+    Callback: function (collection, properties, callback) {
+      CommonWeb.Keen.Client.addEvent(collection, properties, function() {
+        if (CommonWeb.Keen.Debug) {
+          console.log(collection + ": " + JSON.stringify(properties));
+        }
+        if (callback) {
+          callback();
+        }
+      });
+    },
+    globalProperties: {
+      keen: {
+        addons: [
+          {
+            "name": "keen:ip_to_geo",
+            "input": {
+              "ip": "ip_address"
+            },
+            "output": "ip_geo_info"
+          },
+          {
+            "name": "keen:ua_parser",
+            "input": {
+              "ua_string": "user_agent"
+            },
+            "output": "parsed_user_agent"
+          },
+          {
+            "name": "keen:url_parser",
+            "input": {
+              "url": "page_url"
+            },
+            "output": "parsed_page_url"
+          },
+          {
+            "name": "keen:referrer_parser",
+            "input": {
+              "referrer_url": "referrer_url",
+              "page_url": "page_url"
+            },
+            "output": "referrer_info"
+          }
+        ]
+      },
+      ip_address: "${keen.ip}",
+      user_agent: "${keen.user_agent}"
+    }
+  };
+
+  window.CommonWeb = CommonWeb;
+
+})();

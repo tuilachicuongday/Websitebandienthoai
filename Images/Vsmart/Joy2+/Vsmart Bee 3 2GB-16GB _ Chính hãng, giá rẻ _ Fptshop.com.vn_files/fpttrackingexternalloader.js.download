@@ -1,0 +1,447 @@
+//console.log('Code Tracking Implacement Loaded');
+
+//GA 
+
+//---------------------------------------
+
+//FPT Tracking Main
+window.onload = setTimeout(function () {
+	var platform = function () {
+		if ((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)) {
+			return "Mobile";
+		}
+		return "Desktop";
+	}
+	//detect trường hợp cate trùng với value tìm kiếm
+	var arrHref = window.location.href.split('/');
+
+	if (platform() == "Desktop") {
+		// // máy tính xách tay
+		// if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'may-tinh-xach-tay' && arrHref[3] == 'may-tinh-xach-tay') {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/laptop.js?ver=030003072019");
+		// }
+		// // máy tính xách tay
+		// if (window.location.href.includes('may-tinh-xach-tay?utm_expid=')) {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/laptop.js?ver=030003072019");
+		// }
+
+		// // máy tính xách tay v2
+		// if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'may-tinh-xach-tay-2' && arrHref[3] == 'may-tinh-xach-tay-2') {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/laptop-v2.js?ver=030003072019");
+		// }
+
+		// //máy tính xách tay v2
+		// if (window.location.href.includes('may-tinh-xach-tay-2?utm_expid=') || window.location.href.includes('may-tinh-xach-tay-2?trang=')) {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/laptop-v2.js?ver=030003072019");
+		// }
+
+		//chi tiết so sánh
+		if (window.location.href.includes('so-sanh-san-pham?')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/comparedetail.js?ver=030003072019");
+		}
+
+		// // smartphone
+		// if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'dien-thoai' && arrHref[3] == 'dien-thoai') {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/phone.js?ver=030003072019");
+		// }
+		if (window.location.href.includes('/dien-thoai') || window.location.href.includes('/may-tinh-xach-tay')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/category.js?ver=030003072019"); 
+		}
+
+		//index
+		if (window.location.href.substring(window.location.href.indexOf('/') + 2) == 'fptshop.com.vn/') {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/index.js?ver=030003072019");
+			//loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/bannerview.js?ver=030003072019");  
+		}
+
+		// landing phone trợ giá
+		if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'uu-dai-samsung') {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/landingphonetrogia.js?ver=030003072019");
+		}
+
+		//tablet
+		if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'may-tinh-bang' && arrHref[3] == 'may-tinh-bang') {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/tablet.js?ver=030003072019");
+		}
+
+		// product detail view and filter
+		var result = window.location.href.split("/");
+		if (result[result.length - 2] == 'dien-thoai' || result[result.length - 2] == 'may-tinh-bang' || result[result.length - 2] == 'may-tinh-xach-tay') {
+			if ($('.fs-dttname').length > 0) {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/productdetailview.js?ver=030003072019");
+				 
+			} 
+			// version mới k cần nữa
+			// if ($('.filterValue').length > 0) {
+			// 	setTimeout(function () {
+			// 		loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/filter.js?ver=030003072019");
+
+			// 	}, 3000);
+
+			// 	if (window.location.href.includes('may-tinh-xach-tay')) {
+			// 		setTimeout(function () {
+			// 			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/filterlaptop.js?ver=030003072019");
+			// 		}, 3000);
+			// 	}
+			// }
+		}
+		// // filter
+		// if (window.location.href.includes('dien-thoai?') || window.location.href.includes('may-tinh-bang?')) {
+		// 	setTimeout(function () {
+		// 		loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/filter.js?ver=030003072019");
+		// 	}, 2000);
+
+		// }
+		// // filter laptop
+
+		// if (window.location.href.includes('may-tinh-xach-tay?')) {
+		// 	setTimeout(function () {
+		// 		loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/filterlaptop.js?ver=030003072019");
+		// 	}, 2000);
+		// }
+
+		// giỏ hàng v2
+
+		if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'gio-hang-v2' || window.location.href.includes('/thong-tin-nhan-hang') || window.location.href.includes('/thong-tin-thanh-toan') || window.location.href.includes('/don-hang-thanh-cong')) {
+			setTimeout(() => {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/trackcart.js?ver=030003072019");
+			}, 2000);
+		}
+		// Trả góp
+		if (window.location.href.includes('tra-gop') && result[result.length - 1].includes('tra-gop') && !result[3].includes('ctkm') && !result[3].includes('landing')) {
+
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/tragop.js?ver=030003072019");
+		}
+		// Máy đổi tra
+		if (window.location.href.includes('dien-thoai-cu-gia-re/')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/maydoitra.js?ver=030003072019");
+			if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("-").length == 2) {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/productdetailviewmaydoitra.js?ver=030003072019")
+			}
+		}
+
+		//Trả góp ưu đãi
+		if (window.location.href.includes('/tra-gop-uu-dai') || window.location.href.includes('/landing-tra-gop-uu-dai')) {
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/desktop/tragopuudai.js?random=' + Math.random());
+		}
+
+		// productdetailview phụ kiện
+		if (window.location.href.split('/')[3] == 'phu-kien' && !(window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'phu-kien')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/productdetailviewphukien.js?ver=030003072019");
+		}
+		// phụ kiện 
+		if (window.location.href.includes('phu-kien')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/phukien-v2.js?ver=030003072019");
+		}
+		//trang tìm kiếm không có kết quả
+		if (window.location.href.includes('tim-kiem/')) {
+			setTimeout(() => {
+				loadScriptBody('https://js.fpt.shop/gatracking/tracking/desktop/timkiem_notresult.js?ver=093620042019');
+			}, 4000);
+		}
+
+		// ants tracking purchase trả góp
+		if (window.location.href.includes('/tra-gop/thanh-toan-thanh-cong')) {
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/desktop/tragop_ants.js?ver=043906042019');
+		}
+
+		//insider cho trang khuyến mãi
+		if(window.location.href.includes('/khuyen-mai')){
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/desktop/khuyenmai.js')
+		}
+		//insider cho trang tin tức
+		if(window.location.href.includes('/tin-tuc/danh-gia/')){
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/desktop/tintuc.js')
+		}
+		// tracking for dong ho
+		if(window.location.href.includes('/dong-ho')){
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/desktop/dong-ho.js');
+		}
+		// productdetailview đồng hồ
+		if (window.location.href.split('/')[3] == 'dong-ho' && !(window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'dong-ho')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/productdetailviewdongho.js?ver=030003072019");
+		}
+	}
+	// tracking for mobile
+	else {
+		//if(window.location.href.includes('?=tu-chan-rau')){
+
+		// máy tính xách tay
+		// if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'may-tinh-xach-tay' && arrHref[3] == 'may-tinh-xach-tay') {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/laptop.js?ver=030003072019");
+		// }
+
+		// // smartphone
+		// if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'dien-thoai' && arrHref[3] == 'dien-thoai') {
+		// 	loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/phone.js?ver=030003072019");
+		// }
+
+		// Trang chủ
+		if (window.location.href.substring(window.location.href.indexOf('/') + 2) == 'fptshop.com.vn/') {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/index.js?ver=030003072019");
+			//loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/bannerview.js?ver=030003072019"); 
+		}
+
+		// landing phone trợ giá
+		if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'uu-dai-samsung') {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/landingphonetrogia.js?ver=030003072019");
+		}
+
+		// Máy tính bảng
+		if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'may-tinh-bang' && arrHref[3] == 'may-tinh-bang') {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/tablet.js?ver=030003072019");
+		}
+
+		// product detail view and filter
+		var result = window.location.href.split("/");
+		if (result[result.length - 2] == 'dien-thoai' || result[result.length - 2] == 'may-tinh-bang' || result[result.length - 2] == 'may-tinh-xach-tay') {
+			if ($('.mf-dt-pname').length > 0) {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/productdetailview.js?ver=030003072019");
+				// loadScriptBody("https://js.fpt.shop/gatracking/tracking/desktop/relatedproduct.js?ver=030003072019"); 
+			}
+
+		}
+		if (window.location.href.includes('/dien-thoai') || window.location.href.includes('/may-tinh-xach-tay')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/category.js?ver=030003072019"); 
+		}
+		// // filter
+		// //loại bỏ trường hợp /trả góp có param ? id
+		// if (window.location.href.includes('dien-thoai') || window.location.href.includes('may-tinh-bang') || window.location.href.includes('may-tinh-xach-tay') || (window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split('?').length > 1 && !window.location.href.includes('tra-gop'))) {
+		// 	setTimeout(function () {
+		// 		loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/filter.js?ver=030003072019");
+		// 	}, 2000);
+		// }
+		// giỏ hàng v2
+
+		if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'gio-hang-v2' || window.location.href.includes('/thong-tin-nhan-hang') || window.location.href.includes('/thong-tin-thanh-toan') || window.location.href.includes('/don-hang-thanh-cong')) {
+			setTimeout(() => {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/trackcart.js?ver=030003072019");
+			}, 2000);
+
+		}
+		// Trả góp
+		if (window.location.href.includes('tra-gop') && result[result.length - 1].includes('tra-gop') && !result[3].includes('ctkm') && !result[3].includes('landing')) {
+
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/tragop.js?ver=030003072019");
+		}
+		// Máy đổi trả
+		if (window.location.href.includes('dien-thoai-cu-gia-re/')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/maydoitra.js?ver=030003072019");
+			if (window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split("-").length == 2) {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/productdetailviewmaydoitra.js?ver=030003072019");
+			}
+		}
+
+		// Trả góp ưu đãi
+		if (window.location.href.includes('/tra-gop-uu-dai')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/tragopuudai.js?ver=030003072019");
+			$('.tg-gtabs').on('click', function () {
+				loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/tragopuudai.js?ver=030003072019");
+			});
+		}
+
+		// productdetailview phụ kiện
+		if (window.location.href.split('/')[3] == 'phu-kien' && !(window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'phu-kien')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/productdetailviewphukien.js?ver=030003072019");
+		}
+
+		// phụ kiện 
+		if (window.location.href.includes('phu-kien')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/phukien-v2.js?ver=030003072019");
+		}
+		// ants tracking purchase trả góp
+		if (window.location.href.includes('/tra-gop/thanh-toan-thanh-cong')) {
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/mobile/tragop_ants.js?ver=043906042019');
+		}
+
+		//insider cho trang khuyến mãi
+		if(window.location.href.includes('/khuyen-mai')){
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/mobile/khuyenmai.js')
+		}
+
+		// tracking for dong ho
+		if(window.location.href.includes('/dong-ho')){
+			loadScriptBody('https://js.fpt.shop/gatracking/tracking/mobile/dong-ho.js');
+		}
+		// productdetailview đồng hồ
+		if (window.location.href.split('/')[3] == 'dong-ho' && !(window.location.href.substring(window.location.href.lastIndexOf('/') + 1) == 'dong-ho')) {
+			loadScriptBody("https://js.fpt.shop/gatracking/tracking/mobile/productdetailviewdongho.js?ver=030003072019");
+		}
+	}
+
+	//}
+
+}, 1000);
+
+
+// gắn tracking AT
+if (window.location.href.includes("utm_source=accesstrade")) {
+	var key = "checkAT";
+	var valueCheck = 1;
+	document.cookie = key + "=" + valueCheck;
+	window.onload = setTimeout(
+		function () {
+			//loadScriptBody("https://js.fpt.shop/gatracking/tracking/attrackingpixel/attracking.js?ver=030003072019");
+		}, 200);
+}
+else if (getCookie("checkAT") == 1) {
+	window.onload = setTimeout(
+		function () {
+			//loadScriptBody("https://js.fpt.shop/gatracking/tracking/attrackingpixel/attracking.js?ver=030003072019");
+		}, 200);
+}
+
+
+
+
+//===Function Area===
+
+// Detect if library loaded
+function isLoadedScript(lib) {
+	return document.querySelectorAll('[src="' + lib + '"]').length > 0
+}
+
+// Load library
+function loadScriptHead(lib) {
+	var script = document.createElement('script');
+	script.async = true;
+	script.setAttribute('src', lib);
+	document.getElementsByTagName('head')[0].appendChild(script);
+	return script;
+}
+
+function loadScriptBody(lib) {
+	var script = document.createElement('script');
+	script.async = true;
+	script.setAttribute('src', lib);
+	document.getElementsByTagName('body')[0].appendChild(script);
+	return script;
+}
+
+function getCookie(cname) {
+	var name = cname + "=";
+	var decodedCookie = decodeURIComponent(document.cookie);
+	var ca = decodedCookie.split(';');
+	for (var i = 0; i < ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+}
+function setCookie(cname, cvalue, exdays) {
+	var d = new Date();
+	d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+	var expires = "expires=" + d.toUTCString();
+	document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+// ANTS tracking loader
+//var _siteId = "512046464";
+//(function () {
+//	var w = window;
+//	if (w.admp_event) return;
+//	var a = window.admp_event = function () { a.queue.push(arguments); };
+//	a.siteId = _siteId;
+//	a.track = a;
+//	a.queue = [];
+//	var e = document.createElement("script"); e.type = "text/javascript", e.async = !0, e.src = "//st-a.anthill.vn/insight.js";
+//	var t = document.getElementsByTagName("script")[0]; t.parentNode.insertBefore(e, t);
+//})();
+
+//setCookie('flag_ants', '1', 1);
+//var flag_ants = parseInt(getCookie('flag_ants'));
+var flag_ants = 0;
+
+// validate form
+var validateForm = function (name, phone, email) {
+	//debugger;
+	if (email == '') {
+		if (validateName(name) && validatePhone(phone)) {
+			return true;
+		}
+	}
+	else if (validateName(name) && validatePhone(phone) && email != '' && validateEmail(email)) {
+		return true;
+	}
+	return false;
+}
+function validatePhone(phone) {
+	var re = /^(098|095|097|096|0169|0168|0167|0166|0165|0164|0163|0162|090|093|0122|0126|0128|0121|0120|091|094|0123|0124|0125|0127|0129|092|0188|0186|099|0199|086|088|089|087|039|038|037|036|035|034|033|032|070|079|077|076|078|084|081|082|083|085|056|058|059|052)[0-9]{7}$/;
+	return re.test(String(phone));
+}
+function validateEmail(email) {
+	var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(String(email).toLowerCase());
+}
+function validateName(name) {
+	if (name == '') {
+		return false;
+	}
+	return true;
+	//return /^[A-Za-z0-9\s]+$/.test(name);
+}
+function leapYear(year) {
+	return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+}
+function validateCMND(num) {
+	return /^[0-9]{9}$/.test(num) || /^[0-9]{12}$/.test(num)
+}
+function validateBirthday(date, month, year) {
+	if (date < 1 || date > 31) {
+		return false;
+	}
+	if (new Date().getFullYear() < year) {
+		return false;
+	}
+	if (month == 2 && date > 29 && leapYear(year)) {
+		return false;
+	} else if (month == 2 && date > 28 && !leapYear(year)) {
+		return false;
+	}
+	if ((month == 4 || month == 6 || month == 9 || month == 11) && date > 30) {
+		return false;
+	}
+	return true;
+}
+
+
+//get clientId ga
+ga(function (tracker) {
+	console.log(tracker.get('clientId'));
+});
+
+
+
+
+
+
+
+
+
+
+//custom for beta
+
+if(window.location.href.includes("beta1.fpt.shop")){
+	if (window.location.href.substring(window.location.href.indexOf('/') + 2) == 'beta1.fpt.shop:45670/') {
+		loadScriptBody("https://js.fpt.shop/gatracking/tracking/beta/desktop/index.js?ver=030003072019"); 
+	}
+	if (window.location.href.substring(window.location.href.indexOf('/') + 2) == 'beta1.fpt.shop:45671/') {
+		loadScriptBody("https://js.fpt.shop/gatracking/tracking/beta/mobile/index.js?ver=030003072019"); 
+	}
+	if (window.location.href.includes('beta1.fpt.shop:45670/dien-thoai') || window.location.href.includes('beta1.fpt.shop:45670/may-tinh-xach-tay')) {
+		loadScriptBody("https://js.fpt.shop/gatracking/tracking/beta/desktop/category.js?ver=030003072019"); 
+	}
+	if (window.location.href.includes('beta1.fpt.shop:45671/dien-thoai') || window.location.href.includes('beta1.fpt.shop:45671/may-tinh-xach-tay')) {
+		loadScriptBody("https://js.fpt.shop/gatracking/tracking/beta/mobile/category.js?ver=030003072019"); 
+	}
+	if (window.location.href.includes('beta1.fpt.shop:45670/phu-kien')) {
+		loadScriptBody("https://js.fpt.shop/gatracking/tracking/beta/desktop/phukien-v2.js?ver=030003072019"); 
+	}if (window.location.href.includes('beta1.fpt.shop:45671/phu-kien')) {
+		loadScriptBody("https://js.fpt.shop/gatracking/tracking/beta/mobile/phukien-v2.js?ver=030003072019"); 
+	}
+}

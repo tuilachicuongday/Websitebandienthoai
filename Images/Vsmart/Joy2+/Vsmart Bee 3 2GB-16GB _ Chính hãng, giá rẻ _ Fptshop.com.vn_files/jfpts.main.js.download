@@ -1,0 +1,530 @@
+﻿var sugg_history = $(".sugg-his");
+var sugg_propensity = $(".suggest-box-propensity");
+var sugg_popup = $('.suggest, .suggest-rs');
+var sugg_hit = $(".fs-suggest-text");
+var sugg_cate = $(".fs-suggest-cate");
+sugg_history.hide();
+sugg_propensity.hide();
+sugg_popup.hide();
+    getIP = function () {
+        let jsonTest = "http://ip.jsontest.com/",
+        jsonIP = "https://fptshop.com.vn/tim-kiem/getip",
+        ipV4 = "https://ipv4.jsonip.com/";
+        $.post(
+            jsonIP,
+           function (res) {
+                var ipUS = $('#userIP');
+                var ip_user = ipUS.attr('ip-user', res.ip);
+                let getIP = {"ip" : ip_user.attr('ip-user')};
+                sessionStorage.setItem("IP-USER", JSON.stringify(getIP));
+                return getIP;
+            }
+        );
+    }
+    getIP();
+    function getUserIP() {
+        let getIP = $('#userIP').attr('ip-user');
+        return getIP;
+    }
+//get sessionID
+function get_sessionID() {
+        var sessionID = $.cookie('sessionID');
+        return sessionID ? getUserIP() : sessionID;
+}
+get_sessionID();
+// function getUserIP() {
+        // let jsonTest = "http://ip.jsontest.com/",
+        // jsonIP = "https://fptshop.com.vn/tim-kiem/getip",
+        // ipV4 = "https://ipv4.jsonip.com/";
+    // let getIP ;
+        // $.post(jsonIP, function (data) {
+            // var ipUS = $('#userIP');
+            // ipUS.attr('ip-user',data.ip);
+        // })
+    // getIP = $('#userIP').attr('ip-user');
+	// sessionStorage.setItem("IP-USER", getIP);
+    // return getIP;
+// }
+// getUserIP();
+
+var removeChar = function (strInput) {
+    return strInput.replace(/(<([^>]+)>)/ig, "").replace(/!|@|\$|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\'||\"|\&|\#|\[|\]|~/g, "");
+}
+var convertToAscii = function (str) {
+    str = str.toLowerCase();
+    str = str.replace(/!|@|\$|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\'| |\"|\&|\#|\[|\]|~/g, " ")
+        .replace(/!|@|\$|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\:|\'| |\"|\&|\#|\[|\]|~/g, " ")
+        .replace(/-+-/g, "-") //thay th? 2- th�nh 1-
+        .replace(/ + /g, "-") //thay th? 2  th�nh 1
+        .replace(/^\-+|\-+$/g, "")
+        .replace(/^\-+|\-+$/g, "")
+        .replace(/ /g, '-');//c?t b? k? t? - ? �?u v� cu?i chu?i
+    return str;
+}
+function countCart() {
+    var lstCookie = $.cookie('_fsca1');
+    if (typeof lstCookie === "undefined") {
+        $('.countTotalCart').hide();
+    } else {
+        var total = 0;
+        if (lstCookie.indexOf(",") >= 0) {
+            $.each(lstCookie.split(","), function (index, value) {
+                if (value.indexOf("_") >= 0) {
+                    total += 1;
+                }
+            });
+        } else {
+            if (lstCookie.indexOf("_") >= 0) {
+                total += 1;
+            }
+        }
+        $('.countTotalCart').text(total);
+        if (total == 0) {
+            $('.countTotalCart').hide();
+        } else {
+            $('.countTotalCart').show();
+        }
+    }
+}
+countCart();
+$(document).on("click", '.sugg-his .ic-clear', function (e) {
+    e.preventDefault();
+    $.cookie("search-history", '', { path: '/' });
+    $('.keyword, .tab-keyword, .mb-keyword,.mf-frsearch,.fs-stxt').focus();
+    $('.keyword, .tab-keyword, .mb-keyword,.mf-frsearch,.fs-stxt').keyup();
+    $('.sugg-his').hide();
+    return false;
+});
+//
+$(document).on("click", '.search-button', function (e) {
+    var keyword = removeChar($('.keyword, .tab-keyword, .mb-keyword,.mf-frsearch, .fs-stxt').val());
+    addHistorySearch(keyword);
+    var keywords = convertToAscii($('.keyword, .tab-keyword, .mb-keyword, .mf-frsearch, .fs-stxt').val());
+    var b = keywords.replace(/^\-|-$/g, '').trim();
+    // var unCode = unescape(b);
+    if (keyword.length > 0) {
+        window.location.href = `/tim-kiem/${b}`;
+        return;
+    };
+    $('.icon-cance').hide();
+    $('.suggest-box').hide();
+});
+//
+$(".fs-search form").submit(function (e) {
+    e.preventDefault();
+    var keyword = removeChar($('.keyword, .tab-keyword, .mb-keyword,.mf-frsearch, .fs-stxt').val());
+    addHistorySearch(keyword);
+    var keywords = convertToAscii($('.keyword, .tab-keyword, .mb-keyword, .mf-frsearch, .fs-stxt').val());
+    var b = keywords.replace(/^\-|-$/g, ' ').trim();
+    if (keyword.length > 0) {
+        window.location.href = `/tim-kiem/${b}`;
+        return;
+    };
+});
+$(document).on("click", ".fs-suggest-cate a", function () {
+    var keyword = removeChar($(this).find('.sub-cate').text());
+    addHistorySearch(keyword);
+});
+$(document).on("click", ".fs-suggest-text a", function () {
+    var keyword = removeChar($(this).text());
+    addHistorySearch(keyword);
+});
+var getHistorySearch = function () {
+    var searchHistory = $.cookie("search-history");
+    if (searchHistory) {
+        return searchHistory.split(',');
+    }
+    return [];
+}
+var addHistorySearch = function (str) {
+    str = str.trim();
+    var searchHistory = $.cookie("search-history");
+    var serHit = [];
+    if (searchHistory) {
+        serHit = searchHistory.split(',');
+    }
+    serHit.remove(str);
+    serHit.push(str);
+    $.cookie("search-history", serHit, { path: '/' });
+}
+Array.prototype.remove = function () {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+var typingTimer;
+
+$(document).off("keyup", '.keyword, .tab-keyword, .mb-keyword,.mf-frsearch, .fs-stxt');
+$(document).on("keyup", '.keyword, .tab-keyword, .mb-keyword,.mf-frsearch, .fs-stxt', function (e) {
+    e.preventDefault();
+    var data = $(this).val();
+    data.trim();
+    (convertToAscii(data).length > 0) ? $('.icon-cance').show() : $('.icon-cance').hide();
+    $('.msearch-button-btn').show();
+    if (e.key === 'Enter' || e.keyCode === 13) {
+        var keyword = convertToAscii(data);
+        var b = keyword.replace(/^\-|-$/g, ' ').trim();
+        addHistorySearch(data);
+        if (keyword.length > 0) {
+            window.location.href = `/tim-kiem/${b}`;
+            return;
+        }
+    }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(function () {
+        if (data.trim().length > 0) {
+            searchSuggestion(data);
+            var queryIDString = $('#queryID').attr("queryid");
+            $.cookie("queryID", queryIDString, { path: '/' });
+            $('.over-suggest').css({
+                'opacity': '1',
+                'visibility': ' visible'
+            });
+            sugg_propensity.hide();
+        } else {
+            sugg_popup.hide();
+			checkHistory();
+        }
+    }, 300);
+});
+$('.keyword, .tab-keyword, .mb-keyword,.mf-frsearch,.fs-stxt').bind('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var data = $(this).val();
+    $('.over-suggest').css({
+        'opacity': '1',
+        'visibility': ' visible'
+    });
+    if(data == ""){
+        searchSuggestionEmpty();
+    }
+    if (convertToAscii(data).length > 0) {
+        searchSuggestion(data);
+        sugg_popup.css('display', 'flex');
+        $('.icon-cance').show();
+        sugg_propensity.hide();
+    } else {
+        if ($('.keyword, .tab-keyword, .mb-keyword, .mf-frsearch, .fs-stxt').is(":focus")) {
+            var listHis = getHistorySearch();
+            $('.over-suggest').css({
+                'opacity': '1',
+                'visibility': ' visible'
+            });
+            checkHistory();
+        }
+        $('.icon-cance').hide();
+        sugg_popup.hide();
+    }
+    // console.log('dataaaaaaa-----------', data);
+});
+
+$(document).on('click', function (e) {
+    e.stopPropagation();
+    var container = $('.fs-search');
+    // console.log(container.has(e.target).length);
+    if (container.has(e.target).length == 0) {
+        $('.suggest-box, .icon-cance').hide();
+        $('.over-suggest').css({ 'opacity': '0', 'visibility': 'hidden' });
+    }
+});
+
+$(document).on('click', '.over-suggest', function () {
+    $(this).css({
+        'opacity': '0',
+        'visibility': ' hidden'
+    });
+    $('.icon-cance, .fs-result').hide();
+    clearTimeout(typingTimer);
+});
+
+$(document).on('click', '.icon-cance', function () {
+    $(this).hide();
+    $('.mf-frsearch,.fs-stxt').val('');
+    $('.fs-result').hide();
+    $('.keyword, .tab-keyword, .mb-keyword,.mf-frsearch,.fs-stxt').focus();
+    checkHistory();
+    if($('.mf-frsearch,.fs-stxt').val() == ""){
+        searchSuggestionEmpty();
+    }
+});
+function checkHistory() {
+    var listHis = getHistorySearch();
+    if (listHis && listHis.length > 0) {
+        var sugg_his_data = sugg_history.find('ul')[0];
+        $(sugg_his_data).empty();
+        listHis.reverse().slice(0, 7).map((str, strIndex) => {
+            $(sugg_his_data).append(`
+                <li class="sg-p"><a href="/tim-kiem/${convertToAscii(str)}">${removeChar(str)}</a></li>
+            `);
+        });
+        sugg_history.show();
+    } else {
+        sugg_history.hide();
+		searchSuggestionEmpty();
+        sugg_propensity.show();
+    }
+}
+//
+searchSuggestionEmpty = () => {
+        // alert(1);
+        $.ajax({
+            url: "https://fptshop.com.vn/api-data/search/empty",
+            dataType: "json",
+            type: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify({
+                "Session": get_sessionID()
+            }),
+            success: function (res) {
+                var sugg_propensity_data = sugg_propensity.find('ul')[0];
+                // if (str == "") {
+                    $(sugg_propensity_data).empty();
+                    res.forEach(hit => {
+                        $(sugg_propensity_data).append(`
+                            <li class="sg-p"><a href="/tim-kiem/${convertToAscii(hit.objectID)}">${removeChar(hit.objectID)}</a></li>
+                            `);
+                    });
+                // }
+            }
+        });
+    }
+//
+searchSuggestion = function (str) {
+    var sugg_popup = $('.suggest, .suggest-rs');
+    var sugg_hit = $(".fs-suggest-text");
+    var sugg_cate = $(".fs-suggest-cate");
+    // console.log("strrrrr", str);
+    $.ajax({
+        url: "https://fptshop.com.vn/api-data/search/suggest",
+        dataType: "json",
+        type: "POST",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "Keyword": str,
+			"Session": get_sessionID()
+        }),
+        success: function (res) {
+            // debugger;
+            // var sugg_propensity_data = sugg_propensity.find('ul')[0];
+            // if(str == ""){
+                // $(sugg_propensity_data).empty();
+                    // res.suggestion.hits.forEach(hit => {
+                       // $(sugg_propensity_data).append(`
+                        // <li class="sg-p"><a href="/tim-kiem/${convertToAscii(hit.query)}">${removeChar(hit.query)}</a></li>
+                        // `);
+                    // });
+            // }
+            //suggest
+            var keyword = removeChar(str);
+            var keywordAscii = convertToAscii(keyword).replace(/^-/g, '');
+            var data = $('.mf-frsearch, .fs-stxt').val();
+            data.trim();
+            if (data.trim().length > 0) {
+                // searchSuggestion(data);
+                var sugg_hit_data = sugg_hit.find('ul')[0];
+                $(sugg_hit_data).empty();
+                res.suggestion.hits.forEach((hit, hitIndex) => {
+                    $('#queryID').attr('queryid',`${res.suggestion.queryID}`)
+                    $(sugg_hit_data).append(`
+                        <li class="sg-p query-js"
+                            queryID=${res.suggestion.queryID}
+                            obj=${convertToAscii(hit.objectID)}
+                            position=${hitIndex + 1}>
+                                <a href="/tim-kiem/${convertToAscii(hit.query)}">${removeChar(hit.query)}</a>
+                        </li>
+                 `);
+                });
+                if (!res.suggestion.hits.length) {
+                    sugg_hit.hide();
+					$('.line').hide();
+                } else {
+                    sugg_hit.show();
+					$('.line').show();
+                }
+                sugg_cate.find('ul').html(`
+                <li class="sg-p"><a href="/tim-kiem/${keywordAscii}"><span class="sub-cate">${keyword}</span> trong <span class="cate hightText">Sản phẩm mới</span></a></li>
+                <li class="sg-p"><a href="/tim-kiem/${keywordAscii}/san-pham-cu"><span class="sub-cate">${keyword}</span> trong <span class="cate hightText">Sản phẩm cũ</span></a></li>
+                <li class="sg-p"><a href="/tim-kiem/${keywordAscii}/tin-tuc"><span class="sub-cate">${keyword}</span> trong <span class="cate hightText">Tin tức</span></a></li>
+            `);
+                sugg_popup.show();
+            }
+            //product
+            var product = $($(".fs-suggest-product ul")[0]);
+            product.empty();
+            res.searchIndexData.hits.slice(0, 3).forEach((datahit, indexPr) => {
+                var priceText = datahit.PriceOnline ? datahit.PriceOnline : datahit.PriceSpecial ? datahit.PriceSpecial : datahit.PriceMarket ? datahit.PriceMarket : datahit.Price ? datahit.Price : 0;
+                var priceOld = priceText == 0 || priceText == datahit.Price ? 0 : datahit.Price;
+                product.append(`
+                     <li class="ais-Hits-item">
+                        <a href=/${datahit.TypeNameAscii}/${datahit.NameAscii} class="item-js"  queryID=${res.searchIndexData.queryID} objID=${datahit.ObjectID} position=${indexPr + 1}>
+                            <div class="pr-item">
+                                <div class="pr-item__img m-r-8"> <img src="https://images.fpt.shop/unsafe/fit-in/60x60/filters:quality(90):fill(white)/fptshop.com.vn/Uploads/Thumbs/${datahit.UrlPicture}" alt="${datahit.ProductName1}"> </div>
+                                <div class="pr-item__info">
+                                    <h3 class="pr-item__name m-b-4">${datahit._highlightResult.ProductName1.value}</h3>
+                                    <div class="pr-item__price">
+                                        ${
+                                            datahit.IsNotBusiness ?
+											 'Không kinh doanh':
+											 datahit.IsShowFormIdea ?
+											 'Sản phẩm tin đồn':
+											 datahit.IsNotTrade ?
+											 'Ngừng kinh doanh':
+											 datahit.IsComingSoon ? 'Hàng sắp về' :
+											datahit.CountItem == 0 && datahit.Empty > 0 ?
+											 'Tạm hết hàng':
+                                            priceText ? new Intl.NumberFormat('vi-EN', { maximumSignificantDigits: 8 }).format(priceText) : ''}
+                                        <del class="original deal">${priceOld ? new Intl.NumberFormat('vi-EN', { maximumSignificantDigits: 8 }).format(priceOld) : ''}</del>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </a>
+					 </li>
+				`);
+            });
+            var facets = res.searchIndexData.facets;
+            $('.fs-suggest-tags').remove();
+            var leftMenu = $('.suggest-left');
+            $.each(facets, function (attrname, values) {
+                var tagline = $(`
+                <div class="suggest-title fs-suggest-tags">${attrname}</div>
+                <div class="fs-result-box fs-suggest-tags">
+	                <ul>
+	                </ul>
+                </div>`);
+                var taglineitems = tagline.find("ul");
+                $.each(values, function (value, valueid) {
+                    taglineitems.append(`<li class="sg-p"><a href="/tim-kiem/${convertToAscii(str)}?${attrname}=${value}">${value}</a></li>`);
+                });
+                leftMenu.append(tagline);
+            });
+            product.show();
+            if (!res.searchIndexData.hits.length) {
+                $($(".fs-suggest-product .suggest-title")[0]).hide();
+            } else {
+                $($(".fs-suggest-product .suggest-title")[0]).show();
+            }
+            //productNews
+            var productNews = $(".news-list");
+            productNews.empty();
+            res.searchNewsData.hits.slice(0, 3).forEach((datahit, indexNews) => {
+                productNews.append(`
+					<li class="ais-Hits-item news-hits-item hits-js">
+						<div class="pr-item news-item" queryID=${res.searchNewsData.queryID} objID=${datahit.objectID} position=${indexNews + 1}>
+							<div class="pr-item__info" >
+								<h3 class="pr-item__name m-b-4"><a href="/tin-tuc/${datahit.typeNameAscii}/${datahit.nameAscii}"   class="news-js" >${datahit._highlightResult.name.value}</a></h3>
+                                <a href="/tin-tuc/${datahit.typeNameAscii}" class="tag-link btn-light news-js">${datahit.typeName}</a>
+                               ${datahit.tags ? datahit.tags.slice(0, 1).map(it => `<a href=${it.linkUrl} class="tag-link btn-light news-js">${it.tagsName}</a>`) : ''}
+							</div>
+						</div>
+					</li>
+				`);
+            });
+            productNews.show();
+            if (!res.searchNewsData.hits.length) {
+                $($(".fs-suggest-product .suggest-title")[1]).hide();
+            } else {
+                $($(".fs-suggest-product .suggest-title")[1]).show();
+            }
+        },
+        error: function (err) {
+            console.log('Cannot xhr request');
+            console.log(err);
+        }
+    });
+}
+// push data query_suggest
+function pushDataSuggest(element) {
+    var item = $(element);
+    let queryID = item.attr('queryID');
+    let objID = item.attr('obj');
+    let position = item.attr('position');
+    var queryIDString = queryID;
+    $.cookie("queryID", queryIDString, { path: '/' });
+    pushAPI("query_suggestions", queryID, objID, position);
+}
+$(document).on('click', '.query-js', function () {
+    pushDataSuggest(this);
+});
+
+//push Data Product
+function pushData(element) {
+    var item = $(element);
+    let queryID = item.attr('queryID');
+    let objID = item.attr('objID');
+    let position = item.attr('position');
+    var queryIDString = queryID;
+    $.cookie("queryID", queryIDString, { path: '/' });
+    pushAPI("SearchItem", queryID, objID, position);
+}
+$(document).on('click', '.item-js', function () {
+    pushData(this);
+});
+
+//push Data News
+function pushDataNews() {
+    var newsItem = $('.hits-js.getData .news-item');
+    let queryID = newsItem.attr('queryID');
+    let objID = newsItem.attr('objID');
+    let position = newsItem.attr('position');
+    pushAPI("SearchNews", queryID, objID, position);
+    var queryIDString = queryID;
+    $.cookie("queryID", queryIDString, { path: '/' });
+}
+$(document).on('click', '.news-js', function () {
+    var hits = $('.hits-js');
+    hits.removeClass('getData');
+    $(this).closest('.hits-js').addClass('getData');
+    pushDataNews();
+});
+function pushAPI(Index, queryID, objID, position) {
+    const objData = JSON.stringify({
+        "Session": get_sessionID(),
+        "Function": "Search",
+        "Index": Index,
+        "QueryID": queryID,
+        "ObjectID": [objID],
+        "Position": [position]
+    });
+    //
+    $.ajax({
+        url: "https://fptshop.com.vn/api-data/search/tracking",
+        dataType: "json",
+        type: "POST",
+        contentType: 'application/json',
+        data: objData
+    });
+}
+
+//get queryID
+function getQueryID() {
+    return $.cookie('queryID');
+}
+//
+function handleEventTrackingClicks(productID) {
+    let queryID = getQueryID();
+    let sessionID = get_sessionID();
+    let objectID = String(productID);
+    $.cookie("objIDPro", objectID, { path: '/' });
+	$.cookie("userIP", get_sessionID(), { path: '/' });
+    getDataAPI(sessionID, queryID, objectID);
+}
+function getDataAPI(sessionID, queryID, objID) {
+    const objData = JSON.stringify({
+        "Session": sessionID,
+        "QueryID": queryID,
+        "ObjectID": [objID]
+    });
+    $.ajax({
+        url: "https://fptshop.com.vn/api-data/search/checkout",
+        dataType: "json",
+        type: "POST",
+        contentType: 'application/json',
+        data: objData
+    });
+}

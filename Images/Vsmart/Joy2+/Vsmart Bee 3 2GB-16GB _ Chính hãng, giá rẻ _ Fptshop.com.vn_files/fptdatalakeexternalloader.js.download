@@ -1,0 +1,80 @@
+
+try {
+    //console.log('Code Tracking Datalake Loaded');
+    // //FPT Tracking Main
+
+    const injectJS = function(filename) {
+        return new Promise(function(resolve, reject) {
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = filename;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.body.appendChild(s);
+        });
+    };
+
+    //Mautic JS
+    const mauticJS = function() {
+        window['MauticTrackingObject'] = 'mt';
+        window['mt'] = window['mt'] || function() {
+                (window['mt'].q = window['mt'].q || []).push(arguments)
+            }, a = document.createElement('script'),
+            m = document.getElementsByTagName('script')[0];
+        a.async = 1;
+        a.src = 'https://360.anatic.net/mtc.js';
+        m.parentNode.insertBefore(a, m)
+    };
+
+    window.onload = setTimeout(function () {
+        // console.log('OK');
+        if (typeof jQuery != 'undefined') {
+            //It's OK
+            injectJS('https://js.fpt.shop/datalake/resources/common-web.js?ver=030003072019')
+                //.then(() => mauticJS())
+                .then(() => injectJS('https://js.fpt.shop/datalake/resources/custom.js?ver=050420191024'))
+                .then(() => injectJS('https://js.fpt.shop/datalake/resources/usertracking.js?ver=030003072019'))
+                .then(() => injectJS('https://js.fpt.shop/datalake/resources/fptshopdatalake.js?ver=030003072019'))
+                .then(() => injectJS('https://js.fpt.shop/datalake/resources/trackcollection.js?ver=030003072019'));
+        } else {
+            var checkJquery = setInterval(() => {
+                if (typeof jQuery != 'undefined') {
+                    injectJS('https://js.fpt.shop/datalake/resources/common-web.js?ver=030003072019')
+                        //.then(() => mauticJS())
+                        .then(() => injectJS('https://js.fpt.shop/datalake/resources/custom.js?ver=050420191024'))
+                        .then(() => injectJS('https://js.fpt.shop/datalake/resources/usertracking.js?ver=030003072019'))
+                        .then(() => injectJS('https://js.fpt.shop/datalake/resources/fptshopdatalake.js?ver=030003072019'))
+                        .then(() => injectJS('https://js.fpt.shop/datalake/resources/trackcollection.js?ver=030003072019'));
+                    // remove Interval
+                    clearInterval(checkJquery);
+                }
+            }, 50);
+        }
+
+    }, 100);
+}
+catch(err){
+    if(err){
+        console.log('FPT Exception: ');
+        console.log(err);
+    }
+}
+
+// var s1 = document.createElement('link');
+// s1.rel = 'stylesheet';
+// s1.href = "https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.css";
+// var s2 = document.createElement('script');
+// s2.src = "https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.js";
+// var s3 = document.createElement('script');
+// s3.src = "https://cdn.jsdelivr.net/npm/rrweb@latest/dist/record/rrweb-record.min.js";
+// var s4 = document.createElement('link');
+// s4.rel = 'stylesheet';
+// s4.href = "https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/style.css";
+// var s5 = document.createElement('script');
+// s5.src = "https://cdn.jsdelivr.net/npm/rrweb-player@latest/dist/index.js";
+// document.body.appendChild(s1);
+// document.body.appendChild(s2);
+// document.body.appendChild(s3);
+// document.body.appendChild(s4);
+// document.body.appendChild(s5);
+

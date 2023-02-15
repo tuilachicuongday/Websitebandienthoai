@@ -1,0 +1,35 @@
+var flag = document.cookie.substring(document.cookie.search("flag="), document.cookie.search("flag=") + 6).split("=");
+if (flag[0] == 'flag' && flag[1] == '1') {
+    // payment_status
+    if (window.location.href.includes('/thanh-toan-online/don-hang-thanh-cong?id') && !window.location.href.includes('&')) {
+        setCookie('payment_status', 'success', 1);
+    } else if (window.location.href.includes('/thanh-toan-online/thanh-toan-thanh-cong?transactionID') && window.location.href.includes('status=1')) {
+        setCookie('payment_status', 'success', 1);
+    } else if (window.location.href.includes('gio-hang-v2/thanh-toan-thanh-cong?vpc_AdditionalData') && window.location.href.includes('&vpc_ResponseCode=0')) {
+        setCookie('payment_status', 'success', 1);
+    } else if (window.location.href.includes('gio-hang-v2/don-hang-thanh-cong?id') && window.location.href.includes('&ismomo=1')) {
+        setCookie('payment_status', 'success', 1);
+    }
+    else {
+        setCookie('payment_status', '', -1);
+    }
+
+    // lead_status
+
+    if (window.location.href.includes('/gio-hang-v2/don-hang-thanh-cong?id') && !window.location.href.includes('&')) {
+        setCookie('lead_status', 'success', 1);
+    } else if (window.location.href.includes('tra-gop/thanh-toan-thanh-cong?id') && !window.location.href.includes('&')) {
+        setCookie('lead_status', 'success', 1);
+    } else {
+        setCookie('lead_status', '', -1);
+    }
+}
+
+//set cookie
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}

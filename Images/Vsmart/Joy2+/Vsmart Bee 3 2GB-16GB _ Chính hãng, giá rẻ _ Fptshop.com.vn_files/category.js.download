@@ -1,0 +1,186 @@
+//Gắn vào https://fptshop.com.vn/dien-thoai
+
+//get Platform
+var Platform = function () {
+    if ((typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1)) {
+        return "Mobile";
+    }
+    return "Desktop";
+}
+
+
+var jsonProducts = "[";
+var product;
+
+if( dataLayer.find(elem => elem.ecommerce) != undefined)
+{
+    var products = dataLayer.find(elem => elem.ecommerce).ecommerce.impressions;
+    // cho flash sale
+    if( document.querySelectorAll('#Tracking').length > 0){
+        var jsonP = JSON.parse(document.querySelectorAll('#Tracking')[0].value);
+        for (var i = 0; i < jsonP.length; i++) {
+            //var brand = jsonP[i].name.split(" ");
+            product =
+                {
+                    'name': jsonP[i].name,
+                    'id': jsonP[i].id,
+                    'brand': jsonP[i].brand,
+                    'category': jsonP[i].category,
+                    'list': $(".title")[0].innerText,
+                    'position': jsonP[i].position
+                }
+            if (i == jsonP.length - 1) {
+                jsonProducts += (JSON.stringify(product) + "]");
+                dataLayer.push({
+                    'ecommerce': {
+                        'impressions': JSON.parse(jsonProducts)
+                    },
+                    'event': 'productImpression',
+                    'Platform': Platform()
+                });
+                continue;
+            }
+            jsonProducts += (JSON.stringify(product) + ",");
+        }
+    }
+
+
+
+    jsonProducts = "[";
+    for (var i = 0; i < products.length; i++) {
+        product = {
+            'name': products[i].name,
+            'id': products[i].id,
+            'brand': products[i].brand,
+            'category': products[i].category,
+            'list': $('.cdt-head__title')[0].innerText,
+            'position': products[i].position
+        }
+        if (products[i].position < products.length - 1) {
+            jsonProducts += (JSON.stringify(product) + ",");
+        }
+
+        if (products[i].position == products.length - 1) {
+            jsonProducts += (JSON.stringify(product) + "]");
+            dataLayer.push({
+                'ecommerce': {
+                    'impressions': JSON.parse(jsonProducts)
+                },
+                'event': 'productImpression',
+                'Platform': Platform()
+            });
+        }
+    }
+
+
+
+
+    //ProductClick
+    //var products = dataLayer.find(elem => elem.ecommerce).ecommerce.impressions;
+    var products = dataLayer.filter(elem => elem.event == 'productImpression');
+    $('.cdt-product ').on('click', function () {
+        debugger;
+        var compare = this.querySelector('h3 a').innerText;
+        var result = "";
+        for (let i = 0; i < products.length; i++) {
+            if (result == 'undefined') {
+                continue;
+            }
+            if (result != "") {
+                break;
+            }
+            products[i].ecommerce.impressions.find(function (elem) {
+                if (elem.name == compare) {
+                    result = elem;
+                }
+            });
+
+        }
+
+        dataLayer.push({
+            'event': 'ProductClick',
+            'ecommerce': {
+                'click': {
+                    'actionField': { 'list': result.list },
+                    'products': [{
+                        'name': result.name,
+                        'id': result.id,
+                        'price': parseInt(this.querySelector('.progress').innerText.replace(/\./g, "").replace(/₫/g, "")),
+                        'brand': result.brand,
+                        'category': result.category,
+                        'variant': "",
+                        'position': result.position
+                    }]
+                }
+            },
+            'Platform': Platform()
+        });
+        debugger;
+        // ants tracking click product
+        if (flag_ants == 1) {
+            admp_event.track('product', 'click', {
+                name: 'Click To Product',
+                items: [{
+                    id: result.id,
+                    name: result.name
+                }]
+            });
+        }
+        // end ants tracking
+    });
+
+
+    //Banner view 
+
+    //var product;
+    jsonProducts = "["
+    //C1
+    let bannerList = $(".cdt-banner.m-b-20 .slick-slide div div img");
+    for (let i = 0; i < bannerList.length; i++) {
+        let name = bannerList[i].alt;
+        //let creatives = name.split("-");
+        product = {
+            'id': 'C1',
+            'name': name,
+            'creative': '',
+            'position': i
+        }
+        if (i == bannerList.length - 1) {
+            jsonProducts += (JSON.stringify(product) + "]");
+            dataLayer.push({
+                'event': 'promotionView',
+                'ecommerce': {
+                    'promoView': {
+                        'promotions': JSON.parse(jsonProducts)
+                    }
+                }
+            });
+            continue;
+
+        }
+        jsonProducts += (JSON.stringify(product) + ",");
+    }
+
+    // Banner click
+
+    $('.slick-track .slick-slide').on('click', function () {
+        var name = this.querySelector('img').alt;
+        //var result = dataLayer.find(elem => elem.event == 'promotionView').ecommerce.promoView.promotions.find(elem => elem.name == name);
+        dataLayer.push({
+            'event': 'promotionClick',
+            'ecommerce': {
+                'promoClick': {
+                    'promotions': [
+                        {
+                            'id': 'C1',
+                            'name': name,
+                            'creative': '',
+                            'position': parseInt(this.dataset.index)
+                        }
+                    ]
+                }
+            }
+        });
+        debugger;
+    });
+}

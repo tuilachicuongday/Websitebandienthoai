@@ -1,0 +1,134 @@
+var FPTShop_DebugMode = true;
+
+try {
+
+    //console.log('Started Tracking');
+
+    CommonWeb.Callback = function (collection, properties, callback) {
+        //console.log('FPTShop Collection: ' + collection);
+        //console.log('FPTShop Properties: ' + JSON.stringify(properties));
+       
+        //===Track User Viewed Specific Page===
+        if (collection == 'pageviews') {
+            //Splunk
+
+            $.ajax({
+                type: "POST",
+                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Splunk a1d2ab59-2615-42c5-9a7a-4f7527bcedf8');}, 
+                url: 'https://bi.frtecom.com:8088/services/collector/raw',
+                data: JSON.stringify(properties),
+                
+                dataType: "json" 
+            });
+
+            //360Anatic
+            if (typeof mt === "function") { 
+                //Identify User
+                if(localStorage.getItem("user") != null || localStorage.getItem("userattr") != null){
+                    var userattr = {"strack_userattr": JSON.parse(localStorage.getItem("userattr"))};
+                    var user = {"strack_user": JSON.parse(localStorage.getItem("user"))};
+                    var jsonstrack = {};
+                    if(user.strack_user.strack_useremail != null){
+                        jsonstrack['email'] = user.strack_user.strack_useremail;
+                    }
+                    if(user.strack_user.strack_userphone != null){
+                        jsonstrack['phone'] = user.strack_user.strack_userphone;
+                    }
+                    if(user.strack_user.strack_username != null){
+                        jsonstrack['firstname'] = user.strack_user.strack_username;
+                    }
+                    if(user.strack_user.strack_useraddr != null){
+                        jsonstrack['address1'] = user.strack_user.strack_useraddr;
+                    }
+                    jsonstrack['company'] = 'FPT Retail';
+                    
+                    //require at least one unique identifier
+                    if((user.strack_user.strack_useremail != null) || (user.strack_user.strack_userphone != null)){
+                        //mt('send', 'pageview', {email: user.strack_user.strack_useremail, phone: user.strack_user.strack_userphone, firstname: user.strack_user.strack_username, address1: user.strack_user.strack_useraddr, company: 'FPT Retail'});
+                        mt('send', 'pageview', jsonstrack);
+                        console.log('Strack: ' + JSON.stringify(jsonstrack));
+                    }
+                }else{
+                    //Anonymous User
+                    mt('send', 'pageview');
+                }
+            }
+
+              console.log('Tracking page views');
+
+        }//End Tracking Specific Page
+        
+        //===Tracking User Change Some Input===
+        if (collection == 'input-changes') {
+             //Splunk
+
+             $.ajax({
+                type: "POST",
+                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Splunk a1d2ab59-2615-42c5-9a7a-4f7527bcedf8');}, 
+                url: 'https://bi.frtecom.com:8088/services/collector/raw',
+                data: JSON.stringify(properties),
+                
+                dataType: "json" 
+            });
+        }
+        //End Tracking User Change Some Input
+
+        //===Tracking AJAX Form Submissions by Click Tracking===
+        if (collection == 'ajax-form-submission') {
+             //Splunk
+
+             $.ajax({
+                type: "POST",
+                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Splunk a1d2ab59-2615-42c5-9a7a-4f7527bcedf8');}, 
+                url: 'https://bi.frtecom.com:8088/services/collector/raw',
+                data: JSON.stringify(properties),
+                
+                dataType: "json" 
+            });
+           
+        }//End Tracking User Ajax Form Submit
+
+
+        //===Track Clicks===
+
+        //Click 
+        if (collection == 'clicks') {
+             //Splunk
+
+             $.ajax({
+                type: "POST",
+                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Splunk a1d2ab59-2615-42c5-9a7a-4f7527bcedf8');}, 
+                url: 'https://bi.frtecom.com:8088/services/collector/raw',
+                data: JSON.stringify(properties),
+                
+                dataType: "json" 
+            });
+
+        }
+        //====Track Form submissions====
+        
+        if (collection == 'form-submissions') { 
+             //Splunk
+
+             $.ajax({
+                type: "POST",
+                beforeSend: function(xhr){xhr.setRequestHeader('Authorization', 'Splunk a1d2ab59-2615-42c5-9a7a-4f7527bcedf8');}, 
+                url: 'https://bi.frtecom.com:8088/services/collector/raw',
+                data: JSON.stringify(properties),
+                
+                dataType: "json" 
+            });
+
+        }// End tracking form submissions
+
+    };
+
+}//End Try
+catch (err) {
+    if (err) {
+        if (FPTShop_DebugMode) {
+            console.log('FPT Exception: ');
+            console.log(err);
+        }
+    }
+}

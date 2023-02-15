@@ -1,0 +1,98 @@
+//if(window.location.href.includes('?=test-datalake')){
+
+try {
+
+	var trackCollection = async function () {
+		try {
+			await ip_storage();
+		}
+		catch (err) {
+			if (err) {
+				console.log(err);
+			}
+		}
+
+		if (window.location.href.includes('cua-hang/')) {
+			var long = $('.shopv2-list-shop ul li span a').attr('data-long');
+			var lat = $('.shopv2-list-shop ul li span a').attr('data-lat');
+			$('.shopv2-list-shop ul li span a').attr('coord', lat + ", " + long);
+		}
+
+		CommonWeb.trackSession();
+		
+		CommonWeb.trackInputChanges($('input'));
+		CommonWeb.trackPageview();
+		CommonWeb.trackClicks($('a'));
+		CommonWeb.trackClicks($('button'));
+		CommonWeb.trackInputChanges($('textarea'));
+		CommonWeb.trackInputChanges($('select'));
+		CommonWeb.trackFormSubmissions($("form"));
+		// delay 2s sau khi search mới push input change
+		// function debounce(func, wait) {
+		//     var timeout;
+
+		//     return function() {
+		//     var context = this,
+		//         args = arguments;
+
+		//     var executeFunction = function() {
+		//         func.apply(context, args);
+		//     };
+
+		//     clearTimeout(timeout);
+		//     timeout = setTimeout(executeFunction, wait);
+		//     };
+		// };
+
+		// var handleKeypress = debounce(function (e) {
+
+		//     CommonWeb.handleInputChange(e);
+		// }, 2000);
+		// // Set timeout wait 1s init handle InputChange
+		// setTimeout(function() {
+		//     $('.fs-stxt').on('keypress', handleKeypress);
+		// }, 1000);
+
+		//track click suggestion khung search cho mobile
+
+		//track click submit đặt hàng máy đổi trả
+		$('#orderProduct').on('click', function () {
+			setTimeout(() => {
+				CommonWeb.trackInputChanges($('.modal-body input'));
+				CommonWeb.trackClicks($('.modal-body button'));
+				CommonWeb.trackFormSubmissions($('.modal-content form'));
+			}, 1000);
+		});
+		// call function tracking when HeaderV4 render
+		if (window.location.href.includes('/dien-thoai') || window.location.href.includes('/may-tinh-xach-tay') || window.location.href.includes('/may-tinh-bang') || window.location.href.includes('/tim-kiem')) {
+			if ($(".fs-header").length > 0) {
+				var i = 0;
+				$(".fs-header").on("mouseover", function () {
+					if (i == 0) {
+						setTimeout(() => {
+							CommonWeb.trackInputChanges($(".fs-header input"));
+							CommonWeb.trackClicks($(".fs-header a"));
+							CommonWeb.trackClicks($(".fs-header button"));
+						}, 400);
+						i++;
+					}
+				});
+			}
+		}
+		// suggest search for mobile
+		$(".mf-frsearch.keyword.keyindex").on('click', function(){
+			setTimeout(() => {
+				CommonWeb.trackClicks($(".mf-sarm-most a"));
+			}, 500);
+		});
+	}
+
+	// start tracking
+	trackCollection();
+}
+catch (err) {
+	if (err) {
+		console.log("FPT Exception: ");
+		console.log(err);
+	}
+}
